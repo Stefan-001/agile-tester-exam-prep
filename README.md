@@ -54,10 +54,15 @@ An exam preparation platform for "Certified Tester Foundation Level Extension Sy
 
 ## Build + Export
 ```bash
-npm run build
-npm run export
+npm run build:static
 # static site in ./out
 ```
+
+Note: This project uses Next.js 14+ with `output: 'export'` configuration. The build process includes:
+- PDF parsing (`npm run parse:pdfs`)
+- Data preparation (`npm run prepare:data`) 
+- Static site generation (`next build`)
+- GitHub Pages optimization (`.nojekyll` creation)
 
 ## Deploy to GitHub Pages
 This repo includes a GitHub Actions workflow that:
