@@ -1,0 +1,567 @@
+{
+  "files": [
+    {
+      "file": "ISTQB-CTFL-AT_Syllabus_2014 3.json",
+      "source": "ISTQB-CTFL-AT_Syllabus_2014 3.pdf",
+      "topics": [
+        {
+          "id": "t0",
+          "title": "General"
+        },
+        {
+          "id": "t1",
+          "title": "Introduction to this Syllabus ............................................................................................................ 7"
+        },
+        {
+          "id": "t2",
+          "title": "1 Purpose of this Document ...................................................................................................... 7"
+        },
+        {
+          "id": "t3",
+          "title": "2  Overview ................................................................................................................................ 7"
+        },
+        {
+          "id": "t4",
+          "title": "3  Examinable Learning Objectives ........................................................................................... 7"
+        },
+        {
+          "id": "t5",
+          "title": "Agile Software Development - 150 mins. ....................................................................................... 8"
+        },
+        {
+          "id": "t6",
+          "title": "1 The Fundamentals of Agile Software Development ..................................................................... 9"
+        },
+        {
+          "id": "t7",
+          "title": "1.1 Agile Software Development and the Agile Manifesto .......................................................... 9"
+        },
+        {
+          "id": "t8",
+          "title": "1.2 Whole-Team Approach ........................................................................................................ 10"
+        },
+        {
+          "id": "t9",
+          "title": "1.3 Early and Frequent Feedback ............................................................................................. 11"
+        },
+        {
+          "id": "t10",
+          "title": "2 Aspects of Agile Approaches ...................................................................................................... 11"
+        },
+        {
+          "id": "t11",
+          "title": "2.1 Agile Software Development Approaches ........................................................................... 11"
+        },
+        {
+          "id": "t12",
+          "title": "2.2 Collaborative User Story Creation ....................................................................................... 13"
+        },
+        {
+          "id": "t13",
+          "title": "2.3 Retrospectives ..................................................................................................................... 14"
+        },
+        {
+          "id": "t14",
+          "title": "2.4 Continuous Integration ......................................................................................................... 14"
+        },
+        {
+          "id": "t15",
+          "title": "2.5 Release and Iteration Planning ........................................................................................... 16"
+        },
+        {
+          "id": "t16",
+          "title": "Fundamental Agile Testing Principles, Practices, and Processes – 105 mins. ............................ 18"
+        },
+        {
+          "id": "t17",
+          "title": "1 The Differences between Testing in Traditional and Agile Approaches ..................................... 19"
+        },
+        {
+          "id": "t18",
+          "title": "1.1 Testing and Development Activities .................................................................................... 19"
+        },
+        {
+          "id": "t19",
+          "title": "1.2 Project Work Products ......................................................................................................... 20"
+        },
+        {
+          "id": "t20",
+          "title": "1.3 Test Levels........................................................................................................................... 21"
+        },
+        {
+          "id": "t21",
+          "title": "1.4 Testing and Configuration Management ............................................................................. 22"
+        },
+        {
+          "id": "t22",
+          "title": "1.5 Organizational Options for Independent Testing ................................................................. 22"
+        },
+        {
+          "id": "t23",
+          "title": "2 Status of Testing in Agile Projects ....................................................................................... 23"
+        },
+        {
+          "id": "t24",
+          "title": "2.1 Communicating Test Status, Progress, and Product Quality .............................................. 23"
+        },
+        {
+          "id": "t25",
+          "title": "2.2 Managing Regression Risk with Evolving Manual and Automated Test Cases .................. 24"
+        },
+        {
+          "id": "t26",
+          "title": "3 Role and Skills of a Tester in an Agile Team .............................................................................. 25"
+        },
+        {
+          "id": "t27",
+          "title": "3.1 Agile Tester Skills ................................................................................................................ 25"
+        },
+        {
+          "id": "t28",
+          "title": "3.2 The Role of a Tester in an Agile Team ................................................................................ 26"
+        },
+        {
+          "id": "t29",
+          "title": "Agile Testing Methods, Techniques, and Tools – 480 mins. ........................................................ 27"
+        },
+        {
+          "id": "t30",
+          "title": "1 Agile Testing Methods ................................................................................................................. 28"
+        },
+        {
+          "id": "t31",
+          "title": "1.1  Test-Driven  Development,  Acceptance  Test-Driven  Development,  and  Behavior-Driven"
+        },
+        {
+          "id": "t32",
+          "title": "1.2 The Test Pyramid ................................................................................................................ 29"
+        },
+        {
+          "id": "t33",
+          "title": "1.3 Testing Quadrants, Test Levels, and Testing Types ........................................................... 29"
+        },
+        {
+          "id": "t34",
+          "title": "1.4 The Role of a Tester ............................................................................................................ 30"
+        },
+        {
+          "id": "t35",
+          "title": "2 Assessing Quality Risks and Estimating Test Effort ............................................................ 31"
+        },
+        {
+          "id": "t36",
+          "title": "2.1 Assessing Quality Risks in Agile Projects ........................................................................... 31"
+        },
+        {
+          "id": "t37",
+          "title": "2.2 Estimating Testing Effort Based on Content and Risk ........................................................ 32"
+        },
+        {
+          "id": "t38",
+          "title": "3 Techniques in Agile Projects ................................................................................................ 33"
+        },
+        {
+          "id": "t39",
+          "title": "3.1 Acceptance Criteria, Adequate Coverage, and Other Information for Testing .................... 33"
+        },
+        {
+          "id": "t40",
+          "title": "3.2 Applying Acceptance Test-Driven Development ................................................................. 36"
+        },
+        {
+          "id": "t41",
+          "title": "3.3 Functional and Non-Functional Black Box Test Design ...................................................... 36"
+        },
+        {
+          "id": "t42",
+          "title": "3.4 Exploratory Testing and Agile Testing ................................................................................. 36"
+        },
+        {
+          "id": "t43",
+          "title": "4 Tools in Agile Projects ................................................................................................................. 38"
+        },
+        {
+          "id": "t44",
+          "title": "4.1 Task Management and Tracking Tools ............................................................................... 38"
+        },
+        {
+          "id": "t45",
+          "title": "4.2 Communication and Information Sharing Tools .................................................................. 39"
+        },
+        {
+          "id": "t46",
+          "title": "4.3 Software Build and Distribution Tools .................................................................................. 39"
+        },
+        {
+          "id": "t47",
+          "title": "4.4 Configuration Management Tools ....................................................................................... 39"
+        },
+        {
+          "id": "t48",
+          "title": "4.5 Test Design, Implementation, and Execution Tools ............................................................ 40"
+        },
+        {
+          "id": "t49",
+          "title": "4.6 Cloud Computing and Virtualization Tools .......................................................................... 40"
+        },
+        {
+          "id": "t50",
+          "title": "References .................................................................................................................................... 41"
+        },
+        {
+          "id": "t51",
+          "title": "1 Standards .................................................................................................................................... 41"
+        },
+        {
+          "id": "t52",
+          "title": "2 ISTQB Documents ...................................................................................................................... 41"
+        },
+        {
+          "id": "t53",
+          "title": "3 Books .......................................................................................................................................... 41"
+        },
+        {
+          "id": "t54",
+          "title": "4 Agile Terminology ....................................................................................................................... 42"
+        },
+        {
+          "id": "t55",
+          "title": "5 Other References ........................................................................................................................ 42"
+        },
+        {
+          "id": "t56",
+          "title": "Index ............................................................................................................................................. 43"
+        },
+        {
+          "id": "t57",
+          "title": ""
+        },
+        {
+          "id": "t58",
+          "title": "Introduction to this Syllabus"
+        },
+        {
+          "id": "t59",
+          "title": "1 Purpose of this Document"
+        },
+        {
+          "id": "t60",
+          "title": "2  Overview"
+        },
+        {
+          "id": "t61",
+          "title": "3  Examinable Learning Objectives"
+        },
+        {
+          "id": "t62",
+          "title": "Agile Software Development - 150 mins."
+        },
+        {
+          "id": "t63",
+          "title": "1 The Fundamentals of Agile Software Development"
+        },
+        {
+          "id": "t64",
+          "title": "2 Aspects of Agile Approaches"
+        },
+        {
+          "id": "t65",
+          "title": "1 The Fundamentals of Agile Software Development"
+        },
+        {
+          "id": "t66",
+          "title": "1.1 Agile Software Development and the Agile Manifesto"
+        },
+        {
+          "id": "t67",
+          "title": "1.2 Whole-Team Approach"
+        },
+        {
+          "id": "t68",
+          "title": "1.3 Early and Frequent Feedback"
+        },
+        {
+          "id": "t69",
+          "title": "2 Aspects of Agile Approaches"
+        },
+        {
+          "id": "t70",
+          "title": "2.1 Agile Software Development Approaches"
+        },
+        {
+          "id": "t71",
+          "title": "3.2 and Section 3.1.4)."
+        },
+        {
+          "id": "t72",
+          "title": "2.2 Collaborative User Story Creation"
+        },
+        {
+          "id": "t73",
+          "title": "2.3 Retrospectives"
+        },
+        {
+          "id": "t74",
+          "title": "2.4 Continuous Integration"
+        },
+        {
+          "id": "t75",
+          "title": "2.5 Release and Iteration Planning"
+        },
+        {
+          "id": "t76",
+          "title": "Section  1.4. The  required information  must  be  available  to  the  tester  early,  and  yet  change  must  be"
+        },
+        {
+          "id": "t77",
+          "title": "Fundamental Agile Testing Principles, Practices, and"
+        },
+        {
+          "id": "t78",
+          "title": "1  The Differences between Testing in Traditional and Agile Approaches"
+        },
+        {
+          "id": "t79",
+          "title": "2  Status of Testing in Agile Projects"
+        },
+        {
+          "id": "t80",
+          "title": "3  Role and Skills of a Tester in an Agile Team"
+        },
+        {
+          "id": "t81",
+          "title": "1 The Differences between Testing in Traditional and Agile"
+        },
+        {
+          "id": "t82",
+          "title": "1.1 Testing and Development Activities"
+        },
+        {
+          "id": "t83",
+          "title": "Section  4.5).    While  developers  will  focus  on  creating  unit  tests,  testers  should  focus  on  creating"
+        },
+        {
+          "id": "t84",
+          "title": "1.2 Project Work Products"
+        },
+        {
+          "id": "t85",
+          "title": "Business-oriented   work   products   that   describe   what   is   needed   (e.g., requirements"
+        },
+        {
+          "id": "t86",
+          "title": "Development  work  products  that  describe  how  the  system  is  built  (e.g.,  database  entity-"
+        },
+        {
+          "id": "t87",
+          "title": "Test  work  products  that  describe  how  the  system  is  tested  (e.g.,  test  strategies  and  plans),"
+        },
+        {
+          "id": "t88",
+          "title": "1.3 Test Levels"
+        },
+        {
+          "id": "t89",
+          "title": "1.4 Testing and Configuration Management"
+        },
+        {
+          "id": "t90",
+          "title": "1.5 Organizational Options for Independent Testing"
+        },
+        {
+          "id": "t91",
+          "title": "2 Status of Testing in Agile Projects"
+        },
+        {
+          "id": "t92",
+          "title": "2.1 Communicating Test Status, Progress, and Product Quality"
+        },
+        {
+          "id": "t93",
+          "title": "2.2 Managing Regression Risk with Evolving Manual and Automated Test Cases"
+        },
+        {
+          "id": "t94",
+          "title": "3 Role and Skills of a Tester in an Agile Team"
+        },
+        {
+          "id": "t95",
+          "title": "3.1 Agile Tester Skills"
+        },
+        {
+          "id": "t96",
+          "title": "3.2 The Role of a Tester in an Agile Team"
+        },
+        {
+          "id": "t97",
+          "title": "Agile Testing Methods, Techniques, and Tools – 480"
+        },
+        {
+          "id": "t98",
+          "title": "1 Agile Testing Methods"
+        },
+        {
+          "id": "t99",
+          "title": "2 Assessing Quality Risks and Estimating Test Effort"
+        },
+        {
+          "id": "t100",
+          "title": "3 Techniques in Agile Projects"
+        },
+        {
+          "id": "t101",
+          "title": "4 Tools in Agile Projects"
+        },
+        {
+          "id": "t102",
+          "title": "1 Agile Testing Methods"
+        },
+        {
+          "id": "t103",
+          "title": "1.1 Test-Driven Development,    Acceptance Test-Driven Development,    and"
+        },
+        {
+          "id": "t104",
+          "title": "1.2 The Test Pyramid"
+        },
+        {
+          "id": "t105",
+          "title": "1.3 Testing Quadrants, Test Levels, and Testing Types"
+        },
+        {
+          "id": "t106",
+          "title": "1.4 The Role of a Tester"
+        },
+        {
+          "id": "t107",
+          "title": "2.1)."
+        },
+        {
+          "id": "t108",
+          "title": "2.5). The tester collaborates with the team on the following activities during this iteration:"
+        },
+        {
+          "id": "t109",
+          "title": "2 Assessing Quality Risks and Estimating Test Effort"
+        },
+        {
+          "id": "t110",
+          "title": "2.1 Assessing Quality Risks in Agile Projects"
+        },
+        {
+          "id": "t111",
+          "title": "Gather the Agile team members together, including the tester(s)"
+        },
+        {
+          "id": "t112",
+          "title": "List all the backlog items for the current iteration (e.g., on a task board)"
+        },
+        {
+          "id": "t113",
+          "title": "Identify   the   quality   risks   associated   with   each   item,   considering   all   relevant quality"
+        },
+        {
+          "id": "t114",
+          "title": "Assess each identified risk, which includes two activities: categorizing the risk and determining"
+        },
+        {
+          "id": "t115",
+          "title": "Determine the extent of testing proportional to the level of risk."
+        },
+        {
+          "id": "t116",
+          "title": "Select  the  appropriate  test  technique(s)  to  mitigate  each  risk,  based  on  the  risk,  the  level  of"
+        },
+        {
+          "id": "t117",
+          "title": "2.2 Estimating Testing Effort Based on Content and Risk"
+        },
+        {
+          "id": "t118",
+          "title": "3 Techniques in Agile Projects"
+        },
+        {
+          "id": "t119",
+          "title": "3.1 Acceptance Criteria, Adequate Coverage, and Other Information for Testing"
+        },
+        {
+          "id": "t120",
+          "title": "3.2 Applying Acceptance Test-Driven Development"
+        },
+        {
+          "id": "t121",
+          "title": "3.3 Functional and Non-Functional Black Box Test Design"
+        },
+        {
+          "id": "t122",
+          "title": "3.4 Exploratory Testing and Agile Testing"
+        },
+        {
+          "id": "t123",
+          "title": "4 Tools in Agile Projects"
+        },
+        {
+          "id": "t124",
+          "title": "4.1 Task Management and Tracking Tools"
+        },
+        {
+          "id": "t125",
+          "title": "4.2 Communication and Information Sharing Tools"
+        },
+        {
+          "id": "t126",
+          "title": "4.3 Software Build and Distribution Tools"
+        },
+        {
+          "id": "t127",
+          "title": "4.4 Configuration Management Tools"
+        },
+        {
+          "id": "t128",
+          "title": "4.5 Test Design, Implementation, and Execution Tools"
+        },
+        {
+          "id": "t129",
+          "title": "4.6 Cloud Computing and Virtualization Tools"
+        },
+        {
+          "id": "t130",
+          "title": "References"
+        },
+        {
+          "id": "t131",
+          "title": "1 Standards"
+        },
+        {
+          "id": "t132",
+          "title": "2 ISTQB Documents"
+        },
+        {
+          "id": "t133",
+          "title": "3 Books"
+        },
+        {
+          "id": "t134",
+          "title": ""
+        },
+        {
+          "id": "t135",
+          "title": "4 Agile Terminology"
+        },
+        {
+          "id": "t136",
+          "title": "5 Other References"
+        },
+        {
+          "id": "t137",
+          "title": "Index"
+        }
+      ]
+    },
+    {
+      "file": "mock test 1.json",
+      "source": "mock test 1.pdf",
+      "topics": []
+    }
+  ]
+}
