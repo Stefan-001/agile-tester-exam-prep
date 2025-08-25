@@ -1,4 +1,4 @@
-# Agile Tester Exam Prep
+# Agile Tester Exam Prep for new student
 
 An exam preparation platform for "Certified Tester Foundation Level Extension Syllabus – Agile Tester".
 
