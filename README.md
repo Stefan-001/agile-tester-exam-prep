@@ -2,7 +2,7 @@
 
 An exam preparation platform for "Certified Tester Foundation Level Extension Syllabus – Agile Tester".
 
-- Reads syllabus content from `/Documents` (copied to public at build).
+- Reads syllabus content from `/Documents` (copied to public at build) and preprocesses PDFs to JSON under `/data` via GitHub Actions.
 - Generates quizzes, flashcards, and study tools from that material.
 - Deployed to GitHub Pages (static export). Optional persistence via Supabase.
 
@@ -26,7 +26,8 @@ An exam preparation platform for "Certified Tester Foundation Level Extension Sy
 - Modern, accessible UI with dark mode (WCAG-minded)
 
 ## Repository Structure
-- `/Documents` – syllabus files (Markdown). Copied to `public/Documents` at build.
+- `/Documents` – syllabus files (PDF and/or Markdown). Copied to `public/Documents` at build.
+- `/data` – generated JSON from PDF preprocessing (published to `public/data`).
 - `/public` – static assets (includes a `.nojekyll` file for Pages).
 - `/src` – frontend code and client-side data logic
   - `/components` – UI components
@@ -52,6 +53,12 @@ An exam preparation platform for "Certified Tester Foundation Level Extension Sy
    ```
 5. Visit http://localhost:3000/agile-tester-exam-prep (basePath set for Pages; locally it still works with the base path).
 
+To force local PDF → JSON preprocessing (optional locally):
+```bash
+npm run parse:pdfs
+npm run prepare:data
+```
+
 ## Build + Export
 ```bash
 npm run build:static
@@ -59,8 +66,8 @@ npm run build:static
 ```
 
 Note: This project uses Next.js 14+ with `output: 'export'` configuration. The build process includes:
-- PDF parsing (`npm run parse:pdfs`)
-- Data preparation (`npm run prepare:data`) 
+- PDF parsing with pdfjs-dist (`npm run parse:pdfs`) → writes `/data/index.json`
+- Data preparation (`npm run prepare:data`) copies `/data` to `/public/data`
 - Static site generation (`next build`)
 - GitHub Pages optimization (`.nojekyll` creation)
 
@@ -86,32 +93,21 @@ Note: basePath and assetPrefix are pre-set to `/agile-tester-exam-prep` in `next
    NEXT_PUBLIC_SUPABASE_URL=...
    NEXT_PUBLIC_SUPABASE_ANON_KEY=...
    ```
-3. Create tables (SQL suggestion):
-   ```sql
-   -- results table
-   create table if not exists public.results (
-     id uuid primary key,
-     user_id text not null,
-     created_at timestamp with time zone not null,
-     question_id text not null,
-     correct boolean not null,
-     selected jsonb not null,
-     confidence text not null
-   );
-
-   -- progress table
-   create table if not exists public.progress (
-     user_id text primary key,
-     updated_at timestamp with time zone not null,
-     topic_mastery jsonb not null,
-     badges jsonb not null,
-     streak_days int not null default 0
-   );
-   ```
+3. Apply schema + RLS policies (recommended): see `supabase/schema.sql` (copy into Supabase SQL editor and run).
 4. The app will automatically use Supabase when configured; otherwise it stores data locally in the browser.
 
 ## Documents Format
-Place syllabus files in `/Documents` (Markdown). Example structure:
+Place syllabus files in `/Documents` (PDF and/or Markdown). The build will:
+- Parse PDFs with pdfjs-dist into `/data/index.json` using heuristics:
+   - Topic detection from numbered headings like `1.1` or `Section 2`.
+   - Term extraction from `Term: Definition` or `Term – Definition` segments.
+   - Question prompts detected by lines ending with `?` or containing phrases like `example`.
+   - MCQ options detected from nearby segments like `A) ...`, `B) ...`, up to four options. Falls back to a True/False style when options aren’t detected.
+- Copy any markdown under `/Documents` to `public/Documents` as a fallback source.
+
+Tip: To improve parsing quality, prefer clear headings, `Term: Definition` pairs, and format options as `A)`, `B)`, `C)`, `D)` near the question text in the source PDF.
+
+Example Markdown structure:
 
 ```
 # Topic Name
@@ -136,6 +132,10 @@ Explain:
 ```
 
 The build copies `/Documents` to `public/Documents`.
+
+Advanced: Refining heuristics
+- The parser lives at `scripts/parse-pdfs.mjs`. You can tweak patterns for topics, terms, and options.
+- Consider tagging content with consistent labels (e.g., “Definition: …”) or add a curated `data/index.json` for full control.
 
 ## Testing
 ```bash

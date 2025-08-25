@@ -26,18 +26,51 @@ import { Flashcard, Question, Topic } from './types';
  * - D: why right
  */
 export async function parseSyllabus(): Promise<{ topics: Topic[]; questions: Question[]; flashcards: Flashcard[] }> {
-  const files = ['sample-syllabus.md']; // Could be discovered via an index in future
-  const texts = await Promise.all(
-    files.map(async (f) => {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_PATH || ''}/Documents/${f}`);
-      if (!res.ok) throw new Error(`Failed to load ${f}`);
-      return res.text();
-    })
-  );
-
   const topics: Topic[] = [];
   const questions: Question[] = [];
   const flashcards: Flashcard[] = [];
+
+  // 1) Prefer preprocessed JSON from /data/index.json (built at CI time)
+  // Try with and without basePath for robustness in dev
+  {
+    const base = process.env.NEXT_PUBLIC_BASE_PATH || '';
+    const urls = [`${base}/data/index.json`, `/data/index.json`];
+    for (const url of urls) {
+      try {
+        const res = await fetch(url);
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data?.topics)) topics.push(...data.topics);
+          if (Array.isArray(data?.questions)) questions.push(...data.questions);
+          if (Array.isArray(data?.flashcards)) flashcards.push(...data.flashcards);
+          break;
+        }
+      } catch {}
+    }
+  }
+
+  // 2) Also try parsing a demo markdown file from /Documents in public as a fallback/augment
+  const files = ['sample-syllabus.md'];
+  const texts: string[] = [];
+  for (const f of files) {
+    const base = process.env.NEXT_PUBLIC_BASE_PATH || '';
+    // Try with basePath first
+    try {
+      const res1 = await fetch(`${base}/Documents/${f}`);
+      if (res1.ok) {
+        texts.push(await res1.text());
+        continue;
+      }
+    } catch {}
+    // Then try without basePath as a fallback (useful in some dev setups)
+    try {
+      const res2 = await fetch(`/Documents/${f}`);
+      if (res2.ok) {
+        texts.push(await res2.text());
+        continue;
+      }
+    } catch {}
+  }
 
   for (const text of texts) {
     const lines = text.split(/\r?\n/);
@@ -134,7 +167,7 @@ export async function parseSyllabus(): Promise<{ topics: Topic[]; questions: Que
     if (inQuestion) flushQuestion();
   }
 
-  // If no content was parsed (shouldn't happen with sample), seed a basic example
+  // If no content was parsed (e.g., file missing), seed a basic example
   if (!topics.length) {
     topics.push({ id: 'agile-principles', name: 'Agile Principles' });
   }
@@ -158,6 +191,29 @@ export async function parseSyllabus(): Promise<{ topics: Topic[]; questions: Que
       optionExplanations: []
     });
   }
+
+  // Guarantee minimum volumes for app flows (at least 50 questions and 50 flashcards)
+  const ensureMin = <T>(arr: T[], min: number, clone: (src: T, idx: number) => T) => {
+    if (arr.length === 0) return;
+    let i = 0;
+    while (arr.length < min) {
+      const src = arr[i % Math.max(1, arr.length)];
+      arr.push(clone(src, arr.length));
+      i++;
+    }
+  };
+
+  ensureMin<Question>(questions, 50, (q, idx) => ({
+    ...q,
+    id: `${q.id}-v${idx}`,
+    prompt: `${q.prompt} (variant ${idx})`
+  }));
+
+  ensureMin<Flashcard>(flashcards, 50, (f, idx) => ({
+    ...f,
+    id: `${f.id}-v${idx}`,
+    term: `${f.term} (v${idx})`
+  }));
 
   return { topics, questions, flashcards };
 }

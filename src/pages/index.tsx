@@ -4,8 +4,9 @@ import Leaderboard from '@/components/Leaderboard';
 import { useEffect, useState } from 'react';
 import { loadResults, loadProgress } from '@/lib/db';
 import { getCurrentLocalUser } from '@/lib/auth';
-import { computeTopicHeatmap } from '@/lib/analytics';
+import { computeTopicHeatmap, getBestSessions } from '@/lib/analytics';
 import Heatmap from '@/components/Heatmap';
+import { exportCSV, exportProgressPDF } from '@/lib/export';
 
 export default function Home() {
   const [progress, setProgress] = useState(0);
@@ -15,7 +16,7 @@ export default function Home() {
   useEffect(() => {
     const user = getCurrentLocalUser();
     if (!user) return;
-    loadResults(user.id).then((results) => {
+  loadResults(user.id).then((results) => {
       const total = results.length;
       const correct = results.filter((r) => r.correct).length;
       setProgress(total ? Math.round((correct / total) * 100) : 0);
@@ -31,13 +32,16 @@ export default function Home() {
       }
       setEntries(sessions);
 
-      const heat = computeTopicHeatmap(results);
+  const heat = computeTopicHeatmap(results);
       setHeatmap(heat);
     });
 
     loadProgress(user?.id || '').then(() => {
       // could set badges and streaks here
     });
+    if (user) {
+      getBestSessions(user.id).then(setEntries);
+    }
   }, []);
 
   return (
@@ -59,6 +63,30 @@ export default function Home() {
             <Link href="/exam" className="btn btn-secondary">
               Exam Simulator
             </Link>
+            <button
+              className="btn btn-secondary"
+              onClick={async () => {
+                const user = getCurrentLocalUser();
+                if (!user) return;
+                const results = await loadResults(user.id);
+                const rows = [[ 'createdAt', 'questionId', 'correct', 'confidence', 'selected' ], ...results.map(r => [r.createdAt, r.questionId, String(r.correct), r.confidence, JSON.stringify(r.selected)])];
+                exportCSV(rows, 'results.csv');
+              }}
+            >
+              Export CSV
+            </button>
+            <button
+              className="btn btn-secondary"
+              onClick={async () => {
+                const user = getCurrentLocalUser();
+                if (!user) return;
+                const [results, progress] = await Promise.all([loadResults(user.id), loadProgress(user.id)]);
+                if (!progress) return;
+                exportProgressPDF(progress, results);
+              }}
+            >
+              Export PDF
+            </button>
           </div>
         </div>
       </section>

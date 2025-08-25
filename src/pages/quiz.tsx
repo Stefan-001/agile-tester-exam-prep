@@ -5,6 +5,7 @@ import QuizCard from '@/components/QuizCard';
 import { computeQuestionWeights, pickWeighted } from '@/lib/adaptiveLearning';
 import { saveResult } from '@/lib/db';
 import { getCurrentLocalUser } from '@/lib/auth';
+import { safeUuid } from '@/lib/util';
 
 export default function QuizPage() {
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -12,15 +13,22 @@ export default function QuizPage() {
   const [index, setIndex] = useState(0);
   const [history, setHistory] = useState<QuizResult[]>([]);
   const [adaptive, setAdaptive] = useState(true);
+  const [canAdvance, setCanAdvance] = useState(false);
 
   useEffect(() => {
     parseSyllabus().then(({ questions }) => {
-      setQuestions(questions);
-      setQueue(questions.slice(0, 10));
+      const sample = questions.slice(0, Math.min(50, questions.length));
+      setQuestions(sample);
+      setQueue(sample.slice(0, Math.min(10, sample.length)));
     });
   }, []);
 
   const current = queue[index];
+
+  // Reset advance permission whenever the current question changes
+  useEffect(() => {
+    if (current) setCanAdvance(false);
+  }, [current?.id]);
 
   useEffect(() => {
     if (!adaptive || history.length < 3) return;
@@ -33,7 +41,7 @@ export default function QuizPage() {
   async function onSubmit(selected: number[], correct: boolean, confidence: 'low' | 'medium' | 'high') {
     const user = getCurrentLocalUser();
     const result: QuizResult = {
-      id: crypto.randomUUID(),
+  id: safeUuid(),
       userId: user?.id || 'anon',
       createdAt: new Date().toISOString(),
       questionId: current.id,
@@ -43,6 +51,7 @@ export default function QuizPage() {
     };
     setHistory((h) => [...h, result]);
     await saveResult(result.userId, result);
+  setCanAdvance(true);
   }
 
   return (
@@ -57,15 +66,23 @@ export default function QuizPage() {
       </div>
       {current ? (
         <>
-          <QuizCard
+      <QuizCard
+            key={current.id}
             question={current}
             onSubmit={(s, c, conf) => {
               onSubmit(s, c, conf);
-              setTimeout(() => {
-                setIndex((i) => (i + 1) % queue.length);
-              }, 500);
+        // Do not auto-advance; require user to click Next or the in-card Next after reveal
             }}
+            onNext={() => setIndex((i) => (i + 1) % queue.length)}
           />
+          <div className="flex items-center justify-end gap-2">
+            <button className="btn btn-secondary" onClick={() => setIndex((i) => (i - 1 + queue.length) % queue.length)} disabled={index === 0}>
+              Previous
+            </button>
+            <button className="btn btn-primary" onClick={() => setIndex((i) => (i + 1) % queue.length)} disabled={!canAdvance}>
+              Next
+            </button>
+          </div>
           <div className="text-sm text-gray-600 dark:text-gray-300">
             Question {index + 1} of {queue.length}
           </div>

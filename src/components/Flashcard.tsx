@@ -6,7 +6,12 @@ export default function FlashcardView({ card, onRate }: { card: Flashcard; onRat
   const [flipped, setFlipped] = useState(false);
   return (
     <div className="card w-full">
-      <div className="mb-2 text-sm text-gray-500">Topic: {card.topicId}</div>
+      <div className="mb-2 text-sm text-gray-500">
+        <div>Topic: {card.topicId}</div>
+        {card.source ? (
+          <div className="text-xs">Source: {card.source.pdf}, p.{card.source.page}</div>
+        ) : null}
+      </div>
       <div
         className={classNames('flex cursor-pointer items-center justify-center rounded border p-8 text-center', 'border-gray-300 dark:border-gray-700')}
         role="button"

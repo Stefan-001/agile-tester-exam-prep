@@ -21,6 +21,12 @@ export default function NavBar() {
           <Link className="hover:underline" href="/notes">
             Notes
           </Link>
+          <Link className="hover:underline" href="/login">
+            Login
+          </Link>
+          <Link className="hover:underline" href="/register">
+            Register
+          </Link>
           <DarkModeToggle />
         </div>
       </div>

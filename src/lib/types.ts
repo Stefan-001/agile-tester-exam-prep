@@ -9,6 +9,7 @@ export type Flashcard = {
   topicId: string;
   term: string;
   definition: string;
+  source?: { pdf: string; page: number; context?: string };
   lastReviewedAt?: string; // ISO
   easeFactor?: number; // for SM-2
   interval?: number; // days
@@ -26,6 +27,7 @@ export type Question = {
   explanation: string;
   optionExplanations?: string[];
   difficulty?: 'easy' | 'medium' | 'hard';
+  source?: { pdf: string; page: number; context?: string };
 };
 
 export type UserProfile = {
