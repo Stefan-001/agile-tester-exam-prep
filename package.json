@@ -1,0 +1,49 @@
+{
+  "name": "agile-tester-exam-prep",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Exam preparation platform for 'Certified Tester Foundation Level Extension Syllabus – Agile Tester'",
+  "scripts": {
+    "prebuild": "node scripts/copy-docs.js",
+    "dev": "next dev",
+    "build": "next build",
+    "export": "next export",
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint . --ext .ts,.tsx",
+    "test": "jest --passWithNoTests",
+    "test:watch": "jest --watch",
+    "postexport": "node scripts/post-export.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.1",
+    "chart.js": "^4.4.3",
+    "dayjs": "^1.11.13",
+    "jspdf": "^2.5.2",
+    "next": "^14.2.5",
+    "react": "^18.3.1",
+    "react-chartjs-2": "^5.2.0",
+    "react-dom": "^18.3.1",
+    "zod": "^3.23.8",
+    "classnames": "^2.5.1"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.0.0",
+    "@types/jest": "^29.5.12",
+    "@types/node": "^20.14.11",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "autoprefixer": "^10.4.20",
+    "eslint": "^8.57.0",
+    "eslint-config-next": "^14.2.5",
+    "fs-extra": "^11.2.0",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "postcss": "^8.4.41",
+    "tailwindcss": "^3.4.10",
+    "ts-jest": "^29.2.5",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.5.4"
+  }
+}
