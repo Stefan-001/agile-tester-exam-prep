@@ -1,21 +1,9 @@
-export default function ConfidenceMeter({
-  value,
-  onChange
-}: {
-  value: 'low' | 'medium' | 'high';
-  onChange: (v: 'low' | 'medium' | 'high') => void;
-}) {
+export function ConfidenceMeter({ value, onChange }: { value: number; onChange: (v: number) => void }) {
   return (
-    <fieldset>
-      <legend className="label">Confidence</legend>
-      <div className="flex gap-2">
-        {(['low', 'medium', 'high'] as const).map((v) => (
-          <label key={v} className="inline-flex items-center gap-2">
-            <input type="radio" name="confidence" value={v} checked={value === v} onChange={() => onChange(v)} />
-            <span className="capitalize">{v}</span>
-          </label>
-        ))}
-      </div>
-    </fieldset>
+    <div className="flex items-center gap-2">
+      <span className="text-sm">Confidence</span>
+      <input type="range" min={1} max={5} value={value} onChange={(e) => onChange(Number(e.target.value))} />
+      <span className="text-sm">{value}</span>
+    </div>
   );
 }

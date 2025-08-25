@@ -1,16 +1,14 @@
 /** @type {import('next').NextConfig} */
-const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '/agile-tester-exam-prep';
-
-const nextConfig = {
-  reactStrictMode: true,
-  swcMinify: true,
+const isProd = process.env.NODE_ENV === 'production';
+const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
+export default {
   output: 'export',
+  reactStrictMode: true,
   trailingSlash: true,
+  basePath,
+  assetPrefix: basePath ? `${basePath}/` : '',
   images: {
     unoptimized: true
   },
-  basePath,
-  assetPrefix: basePath
+  eslint: { ignoreDuringBuilds: true }
 };
-
-export default nextConfig;

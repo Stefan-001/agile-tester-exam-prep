@@ -1,17 +1,7 @@
-type Props = { value: number; label?: string };
-export default function ProgressBar({ value, label }: Props) {
-  const pct = Math.max(0, Math.min(100, Math.round(value)));
+export function ProgressBar({ value }: { value: number }) {
   return (
-    <div>
-      {label && (
-        <div className="mb-1 flex items-center justify-between">
-          <span className="text-sm">{label}</span>
-          <span className="text-sm">{pct}%</span>
-        </div>
-      )}
-      <div className="h-3 w-full rounded bg-gray-200 dark:bg-gray-700" role="progressbar" aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100}>
-        <div className="h-3 rounded bg-brand" style={{ width: `${pct}%` }} />
-      </div>
+    <div className="w-full bg-gray-200 dark:bg-gray-800 rounded">
+      <div className="bg-green-500 h-2 rounded" style={{ width: `${Math.min(100, Math.max(0, value))}%` }} />
     </div>
   );
 }
