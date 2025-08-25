@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { loginLocal } from '@/lib/auth';
 import { useRouter } from 'next/router';
+import Link from 'next/link';
 
 export default function Login() {
   const [username, setUsername] = useState('');
@@ -34,7 +35,7 @@ export default function Login() {
         {err && <div className="rounded bg-red-100 p-2 text-sm text-red-800 dark:bg-red-900/30 dark:text-red-200">{err}</div>}
         <button type="submit" className="btn btn-primary w-full">Login</button>
         <p className="text-sm text-gray-600 dark:text-gray-300">
-          No account? <a className="underline" href="/register">Register</a>
+          No account? <Link className="underline" href="/register">Register</Link>
         </p>
       </form>
     </div>
