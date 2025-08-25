@@ -1,5 +1,5 @@
 import { Question } from '@/lib/types';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { gradeQuestion } from '@/lib/quizEngine';
 import ConfidenceMeter from './ConfidenceMeter';
 import classNames from 'classnames';
@@ -7,13 +7,22 @@ import classNames from 'classnames';
 type Props = {
   question: Question;
   onSubmit: (selected: number[], correct: boolean, confidence: 'low' | 'medium' | 'high') => void;
+  onNext?: () => void;
 };
 
-export default function QuizCard({ question, onSubmit }: Props) {
+export default function QuizCard({ question, onSubmit, onNext }: Props) {
   const [selected, setSelected] = useState<number[]>([]);
   const [confidence, setConfidence] = useState<'low' | 'medium' | 'high'>('medium');
   const [revealed, setRevealed] = useState(false);
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
+
+  // Reset state whenever the question changes
+  useEffect(() => {
+    setSelected([]);
+    setConfidence('medium');
+    setRevealed(false);
+    setIsCorrect(null);
+  }, [question.id]);
 
   function toggleOption(idx: number) {
     setSelected((prev) => {
@@ -34,7 +43,12 @@ export default function QuizCard({ question, onSubmit }: Props) {
 
   return (
     <div className="card w-full">
-      <div className="mb-2 text-sm text-gray-500">Topic: {question.topicId}</div>
+      <div className="mb-2 text-sm text-gray-500">
+        <div>Topic: {question.topicId}</div>
+        {question.source ? (
+          <div className="text-xs">Source: {question.source.pdf}, p.{question.source.page}</div>
+        ) : null}
+      </div>
       <h2 className="mb-4 text-lg font-semibold">{question.prompt}</h2>
       <div role="group" aria-label="Options" className="space-y-2">
         {question.options.map((opt, i) => {
@@ -68,6 +82,16 @@ export default function QuizCard({ question, onSubmit }: Props) {
             {isCorrect ? 'Correct!' : 'Incorrect'}
           </div>
         )}
+        {revealed && (
+          <button
+            className="btn btn-secondary ml-auto"
+            onClick={() => {
+              if (onNext) onNext();
+            }}
+          >
+            Next
+          </button>
+        )}
       </div>
       {revealed && (
         <div className="mt-4 space-y-2">
@@ -81,6 +105,14 @@ export default function QuizCard({ question, onSubmit }: Props) {
                 </li>
               ))}
             </ul>
+          ) : null}
+          {question.source?.context ? (
+            <div className="mt-3">
+              <h4 className="font-semibold">Source snippet</h4>
+              <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap border-l-2 border-brand/50 pl-3 italic">
+                {`"${question.source.context}"`}
+              </p>
+            </div>
           ) : null}
         </div>
       )}

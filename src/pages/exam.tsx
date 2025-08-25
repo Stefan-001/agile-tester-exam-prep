@@ -4,6 +4,7 @@ import { Question, QuizResult } from '@/lib/types';
 import QuizCard from '@/components/QuizCard';
 import { saveResult } from '@/lib/db';
 import { getCurrentLocalUser } from '@/lib/auth';
+import { safeUuid } from '@/lib/util';
 
 const EXAM_MINUTES = 30;
 
@@ -16,7 +17,8 @@ export default function ExamPage() {
 
   useEffect(() => {
     parseSyllabus().then(({ questions }) => {
-      const shuffled = [...questions].sort(() => Math.random() - 0.5).slice(0, 40); // pick 40
+  const count = Math.min(50, questions.length || 50);
+  const shuffled = [...questions].sort(() => Math.random() - 0.5).slice(0, count);
       setQuestions(shuffled);
       setEndAt(Date.now() + EXAM_MINUTES * 60 * 1000);
     });
@@ -44,7 +46,7 @@ export default function ExamPage() {
     setFinished(true);
     const user = getCurrentLocalUser();
     const resList: QuizResult[] = Object.entries(answers).map(([qid, v]) => ({
-      id: crypto.randomUUID(),
+      id: safeUuid(),
       userId: user?.id || 'anon',
       createdAt: new Date().toISOString(),
       questionId: qid,
@@ -79,6 +81,7 @@ export default function ExamPage() {
         questions[index] ? (
           <>
             <QuizCard
+              key={questions[index].id}
               question={questions[index]}
               onSubmit={(s, c, conf) => {
                 onSubmit(s, c, conf);
@@ -86,6 +89,7 @@ export default function ExamPage() {
                   setIndex((i) => Math.min(i + 1, questions.length - 1));
                 }, 400);
               }}
+              onNext={() => setIndex((i) => Math.min(i + 1, questions.length - 1))}
             />
             <div className="flex items-center justify-between">
               <div>
@@ -120,11 +124,17 @@ export default function ExamPage() {
           <details>
             <summary className="cursor-pointer">Breakdown by question</summary>
             <ul className="ml-5 list-disc">
-              {Object.entries(answers).map(([qid, v]) => (
-                <li key={qid}>
-                  {qid} - {v.correct ? 'Correct' : 'Incorrect'} (conf: {v.confidence})
-                </li>
-              ))}
+              {Object.entries(answers).map(([qid, v]) => {
+                const q = questions.find((x) => x.id === qid);
+                return (
+                  <li key={qid}>
+                    {qid} - {v.correct ? 'Correct' : 'Incorrect'} (conf: {v.confidence})
+                    {q?.source ? (
+                      <span className="ml-2 text-xs text-gray-500">Source: {q.source.pdf}, p.{q.source.page}</span>
+                    ) : null}
+                  </li>
+                );
+              })}
             </ul>
           </details>
         </div>

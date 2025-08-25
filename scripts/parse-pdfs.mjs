@@ -1,78 +1,175 @@
-import fs from 'fs';
-import path from 'path';
-import pdfParse from 'pdf-parse';
+#!/usr/bin/env node
 
-const docsDir = path.resolve('Documents');
-const dataDir = path.resolve('data');
+/* Parses PDF syllabus documents into structured JSON for the app using pdfjs-dist */
+import { promises as fs } from 'fs';
+import { join, dirname, extname } from 'path';
+import { fileURLToPath } from 'url';
+import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs';
 
-if (!fs.existsSync(dataDir)) {
-  fs.mkdirSync(dataDir, { recursive: true });
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+async function extractTextFromPdf(filePath) {
+  // Use the node build
+  const data = new Uint8Array(await fs.readFile(filePath));
+  // Point to standard fonts to avoid warnings in Node
+  const standardFontDataUrl = new URL('../node_modules/pdfjs-dist/standard_fonts/', import.meta.url).toString();
+  const loadingTask = pdfjsLib.getDocument({ data, standardFontDataUrl, disableFontFace: true });
+  const pdf = await loadingTask.promise;
+  const pages = [];
+  for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+    const page = await pdf.getPage(pageNum);
+    const content = await page.getTextContent();
+    const strings = content.items.map((item) => ('str' in item ? item.str : '')).filter(Boolean);
+    pages.push({ page: pageNum, text: strings.join(' ') });
+  }
+  return pages;
 }
 
-function extractTopicsAndItems(text) {
-  // Very simple heuristic parser; adjust as needed for your syllabus formatting
-  const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+function naiveParseToStructure(pages, pdfName) {
+  // Heuristics to produce topics, flashcards, and questions from PDF text.
+  // We get text per page; split each page into segments by multiple spaces to simulate breaks.
   const topics = [];
-  let current = { id: 't0', title: 'General', terms: [], questions: [] };
-  let topicIndex = 0;
+  const flashcards = [];
+  const questions = [];
+  let currentTopic = null;
 
-  for (const line of lines) {
-    if (/^(chapter|section|\d+\.)/i.test(line)) {
-      if (current.terms.length || current.questions.length || current.title !== 'General') {
-        topics.push(current);
+  for (const { page, text } of pages) {
+    const line = text.trim();
+    // Topic detection on each page first
+    if (/^(chapter|section)\s+\d+/i.test(line) || /^\d+\.\d+/.test(line)) {
+      const name = line.replace(/^\d+\.\d+\s*/, '').replace(/^(Chapter|Section)\s+\d+\s*[:.-]?\s*/i, '').slice(0, 60) || 'Topic';
+      const id = name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+      currentTopic = { id, name };
+      if (!topics.find((t) => t.id === id)) topics.push(currentTopic);
+    }
+
+    const segments = line.split(/\s{2,}/).map((s) => s.trim()).filter(Boolean);
+    // Scan segments for terms and questions
+    for (let i = 0; i < segments.length; i++) {
+      const seg = segments[i];
+      // Topic heading in segment
+      if (/^(chapter|section)\s+\d+/i.test(seg) || /^\d+\.\d+\s+/.test(seg)) {
+        const name = seg.replace(/^\d+\.\d+\s*/, '').replace(/^(Chapter|Section)\s+\d+\s*[:.-]?\s*/i, '').slice(0, 60) || 'Topic';
+        const id = name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+        currentTopic = { id, name };
+        if (!topics.find((t) => t.id === id)) topics.push(currentTopic);
+        continue;
       }
-      topicIndex += 1;
-      current = { id: `t${topicIndex}`, title: line.replace(/^\d+\.\s*/, ''), terms: [], questions: [] };
-    } else {
-      // Create simple flashcards from colon lines or definition-like sentences
-      if (line.includes(':')) {
-        const [term, ...rest] = line.split(':');
-        const def = rest.join(':').trim();
-        if (term && def && term.length < 120) {
-          current.terms.push({ term: term.trim(), definition: def });
+
+      // Term: Definition
+      if (currentTopic && /[:–-]\s+/.test(seg)) {
+        const [termPart, ...rest] = seg.split(/[:–-]\s+/);
+        const term = termPart.trim();
+        const definition = rest.join(': ').trim();
+    if (term && definition && term.length <= 60 && definition.length >= 5) {
+          const fid = `${currentTopic.id}:${term.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
+          if (!flashcards.find((f) => f.id === fid)) {
+      flashcards.push({ id: fid, topicId: currentTopic.id, term, definition, source: { pdf: pdfName, page, context: seg } });
+            continue;
+          }
         }
       }
-      // Create naive MCQ scaffolding by turning declarative sentences into Q/A
-      if (/[.!?]$/.test(line) && line.split(' ').length > 6) {
-        const stem = `Which of the following best reflects: "${line.slice(0, 120)}"`;
-        const options = [
-          { id: 'A', text: line, correct: true, explanation: 'Directly derived from syllabus sentence.' },
-          { id: 'B', text: 'A related but incorrect statement.', correct: false, explanation: 'Distractor.' },
-          { id: 'C', text: 'Another plausible but incorrect statement.', correct: false, explanation: 'Distractor.' },
-          { id: 'D', text: 'An opposite or edge-case statement.', correct: false, explanation: 'Distractor.' }
-        ];
-        current.questions.push({ stem, options, multi: false, topicId: current.id });
+
+      // Question with options following
+      if (currentTopic && (/\?$/.test(seg) || /\b(example|for example|e\.g\.)\b/i.test(seg))) {
+        const prompt = seg.slice(0, 200);
+        const options = [];
+        const pattern = /^(?:[A-D][\)\.]\s*)(.+)$/;
+        for (let j = i + 1; j < Math.min(segments.length, i + 8); j++) {
+          const m = segments[j].match(pattern);
+          if (m) options.push(m[1].trim());
+        }
+    if (options.length >= 3) {
+          const qid = `${currentTopic.id}:${Math.random().toString(36).slice(2, 8)}`;
+          questions.push({
+            id: qid,
+            topicId: currentTopic.id,
+            prompt,
+            options: options.slice(0, 4),
+            correct: [0],
+            multiCorrect: false,
+      explanation: 'Derived heuristically from syllabus content.',
+      source: { pdf: pdfName, page, context: seg }
+          });
+          continue;
+        } else {
+          // Fallback True/False style
+          const qid = `${currentTopic.id}:${Math.random().toString(36).slice(2, 8)}`;
+          questions.push({
+            id: qid,
+            topicId: currentTopic.id,
+            prompt,
+            options: ['True', 'False', 'Not stated', 'Irrelevant'],
+            correct: [0],
+            multiCorrect: false,
+      explanation: 'Derived heuristically from syllabus example statement.',
+      source: { pdf: pdfName, page, context: seg }
+          });
+          continue;
+        }
       }
     }
   }
-  if (current.terms.length || current.questions.length || current.title !== 'General') {
-    topics.push(current);
-  }
-  return topics;
+
+  // fallback seeds if nothing parsed
+  if (!topics.length) topics.push({ id: 'agile-principles', name: 'Agile Principles' });
+  if (!flashcards.length) flashcards.push({ id: 'agile-principles:agile', topicId: 'agile-principles', term: 'Agile', definition: 'Iterative, collaborative, value-first delivery.' });
+  if (!questions.length) questions.push({ id: 'agile-principles:q1', topicId: 'agile-principles', prompt: 'Agile values?', options: ['Individuals and interactions', 'Comprehensive documentation', 'Customer collaboration', 'Following a plan'], correct: [0,2], multiCorrect: true, explanation: 'Agile Manifesto core values.' });
+
+  return { topics, flashcards, questions };
 }
 
-async function run() {
-  const pdfs = fs.existsSync(docsDir) ? fs.readdirSync(docsDir).filter(f => f.toLowerCase().endsWith('.pdf')) : [];
-  const index = [];
-  const allTopics = [];
-  for (const pdf of pdfs) {
-    const filePath = path.join(docsDir, pdf);
-    const buffer = fs.readFileSync(filePath);
-    const data = await pdfParse(buffer);
-    const topics = extractTopicsAndItems(data.text);
-    const outName = pdf.replace(/\.pdf$/i, '.json');
-    const outPath = path.join(dataDir, outName);
-    fs.writeFileSync(outPath, JSON.stringify({ source: pdf, topics }, null, 2));
-    index.push({ file: outName, source: pdf, topics: topics.map(t => ({ id: t.id, title: t.title })) });
-    allTopics.push(...topics);
-  }
+async function main() {
+  try {
+    const rootDir = join(__dirname, '..');
+    const documentsDir = join(rootDir, 'Documents');
+    const dataDir = join(rootDir, 'data');
 
-  // Write index and combined topics
-  fs.writeFileSync(path.join(dataDir, 'index.json'), JSON.stringify({ files: index }, null, 2));
-  fs.writeFileSync(path.join(dataDir, 'all-topics.json'), JSON.stringify({ topics: allTopics }, null, 2));
+    try {
+      await fs.access(documentsDir);
+    } catch {
+      console.log('No Documents directory found; skipping PDF parsing');
+      return;
+    }
+
+    await fs.mkdir(dataDir, { recursive: true });
+
+  const files = await fs.readdir(documentsDir);
+    const pdfs = files.filter((f) => extname(f).toLowerCase() === '.pdf');
+
+    const aggregate = { topics: [], flashcards: [], questions: [], lastUpdated: new Date().toISOString() };
+
+    for (const pdf of pdfs) {
+      const abs = join(documentsDir, pdf);
+      console.log('Parsing PDF:', pdf);
+      try {
+        const pages = await extractTextFromPdf(abs);
+        let pagesToParse = pages;
+        // If this is the target syllabus, focus on page 9
+        if (/ISTQB-CTFL-AT_Syllabus_2014 3\.pdf$/i.test(pdf)) {
+          pagesToParse = pages.filter((p) => p.page === 9);
+        }
+        const structured = naiveParseToStructure(pagesToParse, pdf);
+        const outFile = join(dataDir, pdf.replace(/\.pdf$/i, '.json'));
+        await fs.writeFile(outFile, JSON.stringify(structured, null, 2));
+        aggregate.topics.push(...structured.topics);
+        aggregate.flashcards.push(...structured.flashcards);
+        aggregate.questions.push(...structured.questions);
+      } catch (e) {
+        console.warn('Failed to parse', pdf, e.message || e);
+      }
+    }
+
+    // Also emit a combined index
+    const indexPath = join(dataDir, 'index.json');
+    await fs.writeFile(indexPath, JSON.stringify(aggregate, null, 2));
+
+    console.log('PDF parsing completed. Data written to data/*.json');
+  } catch (error) {
+    console.error('Failed to parse PDFs:', error);
+    process.exit(1);
+  }
 }
 
-run().catch(err => {
-  console.error(err);
-  process.exit(1);
-});
+main();
